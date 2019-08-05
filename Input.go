@@ -11,7 +11,7 @@ type Input struct {
 	Filters        []Filter
 	Validators     []ecmsValidator.Validator
 	BreakOnFailure bool
-	Obscurator     Filter
+	Obscurer     Filter
 }
 
 type InputValueResult struct {
@@ -19,6 +19,10 @@ type InputValueResult struct {
 	RawValue      interface{}
 	ObscuredValue interface{}
 	FilteredValue interface{}
+}
+
+func NewInputValueResult(x interface{}) InputValueResult {
+	return InputValueResult{x, x, x, x}
 }
 
 type InputInterface interface {
@@ -57,8 +61,8 @@ func (i *Input) Validate(x interface{}) (bool, []string, InputValueResult) {
 
 	ivResult.FilteredValue = i.Filter(x)
 
-	if i.Obscurator != nil {
-		ivResult.ObscuredValue = i.Obscurator(x)
+	if i.Obscurer != nil {
+		ivResult.ObscuredValue = i.Obscurer(x)
 	}
 
 	return vResult,
