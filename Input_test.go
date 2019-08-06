@@ -231,10 +231,11 @@ func TestInput_Validate(t *testing.T) {
 			ExpectedResult:        false,
 			ExpectedMessageLen:    1,
 		},
-		{Name: "`Input{Validators(1),BreakOnFailure}` (validators failing)",
+		{Name: "`Input{Validators(1),BreakOnFailure}` (validators passing)",
 			Input: func() *Input {
 				i := &Input{}
 				i.BreakOnFailure = true
+				// Validators will not run when value is `not required` and equal to `nil`
 				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
 				i.Validators = append(i.Validators, test.Validators[test.Last4Social])
 				return i
@@ -244,8 +245,8 @@ func TestInput_Validate(t *testing.T) {
 			ExpectedRawValue:      nil,
 			ExpectedFilteredValue: nil,
 			ExpectedObscuredValue: nil,
-			ExpectedResult:        false,
-			ExpectedMessageLen:    1,
+			ExpectedResult:        true,
+			ExpectedMessageLen:    0,
 		},
 		{Name: "`Input{Validators(1),BreakOnFailure}` (validators passing)",
 			Input: func() *Input {

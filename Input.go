@@ -54,7 +54,7 @@ type InputInterface interface {
 func RunValidators(i *Input, x interface{}) (bool, []string) {
 	hasValidators := i.Validators != nil && len(i.Validators) > 0
 
-	if !i.Required && !hasValidators {
+	if (!i.Required && x == nil) || (!i.Required && !hasValidators) {
 		return true, nil
 	}
 

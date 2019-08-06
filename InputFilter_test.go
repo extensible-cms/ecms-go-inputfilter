@@ -65,3 +65,48 @@ func TestInputFilter_AddInputs(t *testing.T) {
 		})
 	}
 }
+
+/*func TestInputFilter_Validate(t *testing.T) {
+	nameInput := NewInput("name")
+	nameInput.Required = true
+	nameInput.RequiredMessage = "Name is required."
+	nameInput.AddValidator(test.Validators[test.NameValidator])
+
+	emailInput := NewInput("email")
+	emailInput.Required = true
+	emailInput.RequiredMessage = "Email is required."
+	emailInput.AddValidator(test.Validators[test.EmailValidator])
+
+	phoneInput := NewInput("phone")
+	phoneInput.AddValidator(func() ecms_validator.Validator {
+		lenOps := ecms_validator.NewLengthValidatorOptions()
+		lenOps.Min = 10
+		lenOps.Max = 10
+		return ecms_validator.LengthValidator(lenOps)
+	}())
+	phoneInput.AddValidator(test.Validators[test.DigitValidator])
+
+	subjInput := NewInput("subject")
+	subjInput.AddValidator(func() ecms_validator.Validator {
+		lenOps := ecms_validator.NewLengthValidatorOptions()
+		lenOps.Min = 3
+		lenOps.Max = 55
+		return ecms_validator.LengthValidator(lenOps)
+	}())
+	subjInput.AddValidator(test.Validators[test.DescriptionValidator])
+
+	msgInput := NewInput("message")
+	msgInput.Required = true
+	msgInput.RequiredMessage = "Message is required."
+	msgInput.AddValidator(test.Validators[test.DescriptionValidator])
+
+	contactFormInputF := InputFilter{
+		Inputs: map[string]*Input{
+			nameInput.Name:  nameInput,
+			emailInput.Name: emailInput,
+			subjInput.Name:  subjInput,
+			msgInput.Name:   msgInput,
+		},
+		BreakOnFailure: false, // validate all inputs
+	}
+}*/

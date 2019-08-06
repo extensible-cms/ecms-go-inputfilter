@@ -10,6 +10,13 @@ type InputFilter struct {
 	BreakOnFailure bool
 }
 
+func NewInputFilter () *InputFilter {
+	return &InputFilter{
+		Inputs: make(map[string]*Input),
+		BreakOnFailure: false,
+	}
+}
+
 type InputFilterResult struct {
 	Result              bool
 	Messages            map[string][]string
@@ -25,15 +32,9 @@ type InputFilterInterface interface {
 	AddInputs(i []*Input)
 }
 
-func NewInputFilter () *InputFilter {
-	return &InputFilter{
-		Inputs: make(map[string]*Input),
-		BreakOnFailure: false,
-	}
-}
-
 func (inputF *InputFilter) Validate(d map[string]interface{}) InputFilterResult {
 	ir := InputFilterResult{}
+
 	// @todo write body here
 	return ir
 }
