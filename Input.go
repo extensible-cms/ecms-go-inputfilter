@@ -15,6 +15,12 @@ type Input struct {
 	Obscurer        Filter
 }
 
+func NewInput(name string) *Input {
+	return &Input{
+		Name: name,
+	}
+}
+
 type InputResult struct {
 	Name          string
 	Result        bool
@@ -23,12 +29,6 @@ type InputResult struct {
 	RawValue      interface{}
 	ObscuredValue interface{}
 	FilteredValue interface{}
-}
-
-func NewInput(name string) *Input {
-	return &Input{
-		Name: name,
-	}
 }
 
 func NewInputResult(name string, x interface{}) InputResult {
