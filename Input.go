@@ -104,6 +104,9 @@ func (i *Input) Validate(x interface{}) (bool, []string, InputResult) {
 }
 
 func (i *Input) AddValidator(fn ecmsValidator.Validator) {
+	if fn == nil {
+		return
+	}
 	i.Validators = append(i.Validators, fn)
 }
 
@@ -114,6 +117,9 @@ func (i *Input) AddValidators(vs []ecmsValidator.Validator) {
 }
 
 func (i *Input) AddFilter(fn Filter) {
+	if fn == nil {
+		return
+	}
 	i.Filters = append(i.Filters, fn)
 }
 

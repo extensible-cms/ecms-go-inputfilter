@@ -1,6 +1,7 @@
 package ecms_go_inputfilter
 
 import (
+	"fmt"
 	"github.com/extensible-cms/ecms-go-inputfilter/test"
 	ecms_validator "github.com/extensible-cms/ecms-go-validator"
 	"strconv"
@@ -274,3 +275,93 @@ func TestInput_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestInput_AddFilter(t *testing.T) {
+	type TestCaseInputAddFilter struct {
+		Name               string
+		Input              *Input
+		Filters            []Filter
+		ExpectedFiltersLen int
+	}
+
+	identityFilter := func(x interface{}) interface{} {
+		return x
+	}
+
+	for _, tc := range func() []TestCaseInputAddFilter {
+		out := make([]TestCaseInputAddFilter, 0)
+		rangeStr := "aeiou"
+		for i, _ := range rangeStr {
+			input := &Input{}
+			filters := make([]Filter, 0)
+			for j := 0; j < i+1; j += 1 {
+				filters = append(filters, identityFilter)
+			}
+			out = append(out, TestCaseInputAddFilter{
+				fmt.Sprintf("Input.AddFilter(%v)", i+1),
+				input,
+				filters,
+				i + 1,
+			})
+		}
+		return out
+	}() {
+		t.Run(tc.Name, func(t2 *testing.T) {
+			for _, f := range tc.Filters {
+				tc.Input.AddFilter(f)
+			}
+			test.ExpectEqual(t2, fmt.Sprintf("len(Input.Filters) === %v:", tc.ExpectedFiltersLen),
+				len(tc.Input.Filters), tc.ExpectedFiltersLen)
+		})
+	}
+
+	t.Run("Should not add 'nil' values", func(t2 *testing.T) {
+		i:= Input{}
+		i.AddFilter(nil)
+		test.ExpectEqual(t2, "len(Input.Filters) === 0;", len(i.Filters), 0)
+	})
+}
+
+func TestInput_AddFilters(t *testing.T) {
+	type TestCaseInputAddFilter struct {
+		Name               string
+		Input              *Input
+		Filters            []Filter
+		ExpectedFiltersLen int
+	}
+
+	identityFilter := func(x interface{}) interface{} {
+		return x
+	}
+
+	for _, tc := range func() []TestCaseInputAddFilter {
+		out := make([]TestCaseInputAddFilter, 0)
+		for i, _ := range "aeiou" {
+			input := &Input{}
+			filters := make([]Filter, 0)
+			for j := 0; j < i+1; j += 1 {
+				filters = append(filters, identityFilter)
+			}
+			out = append(out, TestCaseInputAddFilter{
+				fmt.Sprintf("Input.AddFilter(%v)", i+1),
+				input,
+				filters,
+				i + 1,
+			})
+		}
+		return out
+	}() {
+		t.Run(tc.Name, func(t2 *testing.T) {
+			tc.Input.AddFilters(tc.Filters)
+			test.ExpectEqual(t2, fmt.Sprintf("len(Input.Filters) === %v:", tc.ExpectedFiltersLen),
+				len(tc.Input.Filters), tc.ExpectedFiltersLen)
+		})
+	}
+
+	t.Run("Should not add 'nil' values", func(t2 *testing.T) {
+		i:= Input{}
+		i.AddFilters(nil)
+		test.ExpectEqual(t2, "len(Input.Filters) === 0;", len(i.Filters), 0)
+	})
+}
+
