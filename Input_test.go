@@ -365,3 +365,88 @@ func TestInput_AddFilters(t *testing.T) {
 	})
 }
 
+func TestInput_AddValidator(t *testing.T) {
+	type TestCaseInputAddValidator struct {
+		Name               string
+		Input              *Input
+		Validators            []ecms_validator.Validator
+		ExpectedValidatorsLen int
+	}
+
+	notEmptyValidator := test.Validators[test.NotEmptyValidator]
+
+	for _, tc := range func() []TestCaseInputAddValidator {
+		out := make([]TestCaseInputAddValidator, 0)
+		rangeStr := "aeiou"
+		for i, _ := range rangeStr {
+			input := &Input{}
+			validators := make([]ecms_validator.Validator, 0)
+			for j := 0; j < i+1; j += 1 {
+				validators = append(validators, notEmptyValidator)
+			}
+			out = append(out, TestCaseInputAddValidator{
+				fmt.Sprintf("Input.AddValidator(%v)", i+1),
+				input,
+				validators,
+				i + 1,
+			})
+		}
+		return out
+	}() {
+		t.Run(tc.Name, func(t2 *testing.T) {
+			for _, f := range tc.Validators {
+				tc.Input.AddValidator(f)
+			}
+			test.ExpectEqual(t2, fmt.Sprintf("len(Input.Validators) === %v:", tc.ExpectedValidatorsLen),
+				len(tc.Input.Validators), tc.ExpectedValidatorsLen)
+		})
+	}
+
+	t.Run("Should not add 'nil' values", func(t2 *testing.T) {
+		i:= Input{}
+		i.AddValidator(nil)
+		test.ExpectEqual(t2, "len(Input.Validators) === 0;", len(i.Validators), 0)
+	})	
+}
+
+
+func TestInput_AddValidators(t *testing.T) {
+	type TestCaseInputAddValidator struct {
+		Name               string
+		Input              *Input
+		Validators            []ecms_validator.Validator
+		ExpectedValidatorsLen int
+	}
+
+	notEmptyValidator := test.Validators[test.NotEmptyValidator]
+
+	for _, tc := range func() []TestCaseInputAddValidator {
+		out := make([]TestCaseInputAddValidator, 0)
+		for i, _ := range "aeiou" {
+			input := &Input{}
+			validators := make([]ecms_validator.Validator, 0)
+			for j := 0; j < i+1; j += 1 {
+				validators = append(validators, notEmptyValidator)
+			}
+			out = append(out, TestCaseInputAddValidator{
+				fmt.Sprintf("Input.AddValidator(%v)", i+1),
+				input,
+				validators,
+				i + 1,
+			})
+		}
+		return out
+	}() {
+		t.Run(tc.Name, func(t2 *testing.T) {
+			tc.Input.AddValidators(tc.Validators)
+			test.ExpectEqual(t2, fmt.Sprintf("len(Input.Validators) === %v:", tc.ExpectedValidatorsLen),
+				len(tc.Input.Validators), tc.ExpectedValidatorsLen)
+		})
+	}
+
+	t.Run("Should not add 'nil' values", func(t2 *testing.T) {
+		i:= Input{}
+		i.AddValidators(nil)
+		test.ExpectEqual(t2, "len(Input.Validators) === 0;", len(i.Validators), 0)
+	})
+}
