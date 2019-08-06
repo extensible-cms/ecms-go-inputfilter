@@ -51,9 +51,9 @@ func RunValidators(i *Input, x interface{}) (bool, []string) {
 		return true, nil
 	}
 
-	if i.Required && !hasValidators {
+	if i.Required && !hasValidators && x == nil {
 		// @todo add noempty validator
-		return false, []string{"\"" + i.Name + "\" is required.  Value received `nil`."}
+		return false, []string{"\"" + i.Name + "\" is required.  Value received: `nil`."}
 	}
 
 	vResult := true
@@ -68,6 +68,7 @@ func RunValidators(i *Input, x interface{}) (bool, []string) {
 			break
 		}
 	}
+
 	return vResult, sliceof.SliceOfStringConcat(messageSlices)
 }
 
@@ -90,7 +91,7 @@ func (i *Input) Validate(x interface{}) (bool, []string, InputResult) {
 	iResult.ObscuredValue = iResult.FilteredValue
 
 	if i.Obscurer != nil {
-		iResult.ObscuredValue = i.Obscurer(x)
+		iResult.ObscuredValue = i.Obscurer(iResult.FilteredValue)
 	}
 
 	return vResult,
