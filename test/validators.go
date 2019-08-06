@@ -14,6 +14,7 @@ const (
 	NameValidator
 	DescriptionValidator
 	NotEmptyValidator
+	Last4Social
 )
 
 func init() {
@@ -25,6 +26,10 @@ func init() {
 	slugValidator := ecms_validator.RegexValidator(slugValidatorOps)
 	notEmptyValidator := ecms_validator.NotEmptyValidator1()
 
+	last4SocialValidatorOps := ecms_validator.NewRegexValidatorOptions()
+	last4SocialValidatorOps.Pattern = regexp.MustCompile("^\\d{4}$")
+	last4SocialValidator := ecms_validator.RegexValidator(last4SocialValidatorOps)
+
 	Validators = map[int]ecms_validator.Validator{
 		IdValidator:          ecms_validator.IntRangeValidator(idValidatorOps),
 		SlugValidator:        slugValidator,
@@ -32,5 +37,6 @@ func init() {
 		NameValidator:        slugValidator, // add name validator
 		DescriptionValidator: slugValidator, // add description/content validator
 		NotEmptyValidator:    notEmptyValidator,
+		Last4Social:          last4SocialValidator,
 	}
 }

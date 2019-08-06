@@ -6,12 +6,13 @@ import (
 )
 
 type Input struct {
-	Name           string
-	Required       bool
-	Filters        []Filter
-	Validators     []ecmsValidator.Validator
-	BreakOnFailure bool
-	Obscurer       Filter
+	Name            string
+	Required        bool
+	Filters         []Filter
+	Validators      []ecmsValidator.Validator
+	//RequiredMessage string
+	BreakOnFailure  bool
+	Obscurer        Filter
 }
 
 type InputResult struct {
@@ -86,12 +87,15 @@ func RunFilters(i *Input, x interface{}) interface{} {
 func (i *Input) Validate(x interface{}) (bool, []string, InputResult) {
 	iResult := NewInputResult(i.Name, x)
 	vResult, messages := RunValidators(i, x)
-	iResult.Value = RunFilters(i, x)
-	iResult.FilteredValue = iResult.Value
-	iResult.ObscuredValue = iResult.FilteredValue
 
-	if i.Obscurer != nil {
-		iResult.ObscuredValue = i.Obscurer(iResult.FilteredValue)
+	if vResult {
+		iResult.Value = RunFilters(i, x)
+		iResult.FilteredValue = iResult.Value
+		iResult.ObscuredValue = iResult.FilteredValue
+
+		if i.Obscurer != nil {
+			iResult.ObscuredValue = i.Obscurer(iResult.FilteredValue)
+		}
 	}
 
 	return vResult,

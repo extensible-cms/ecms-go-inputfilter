@@ -3,6 +3,7 @@ package ecms_go_inputfilter
 import (
 	"github.com/extensible-cms/ecms-go-inputfilter/test"
 	ecms_validator "github.com/extensible-cms/ecms-go-validator"
+	"strconv"
 	"testing"
 )
 
@@ -20,7 +21,7 @@ func TestInput_Validate(t *testing.T) {
 	}
 
 	for _, tc := range []TestCaseInputValidate{
-		{Name: "`Input{}` (passing)",
+		{Name: "`Input{}` (passing case)",
 			Input:                 &Input{},
 			IncomingValue:         "",
 			ExpectedValue:         "",
@@ -28,6 +29,20 @@ func TestInput_Validate(t *testing.T) {
 			ExpectedFilteredValue: "",
 			ExpectedObscuredValue: "",
 			ExpectedResult:        true,
+		},
+		{Name: "`Input{Required}` (failing case)",
+			Input: func() *Input {
+				i := &Input{}
+				i.Required = true
+				return i
+			}(),
+			IncomingValue:         nil,
+			ExpectedValue:         nil,
+			ExpectedRawValue:      nil,
+			ExpectedFilteredValue: nil,
+			ExpectedObscuredValue: nil,
+			ExpectedMessageLen:    1,
+			ExpectedResult:        false,
 		},
 		{Name: "`Input{Validators(1)}` (validator passing)",
 			Input: func() *Input {
@@ -67,10 +82,10 @@ func TestInput_Validate(t *testing.T) {
 				return i
 			}(),
 			IncomingValue:         0,
-			ExpectedValue:         99,
+			ExpectedValue:         0,
 			ExpectedRawValue:      0,
-			ExpectedFilteredValue: 99,
-			ExpectedObscuredValue: 99,
+			ExpectedFilteredValue: 0,
+			ExpectedObscuredValue: 0,
 			ExpectedResult:        false,
 			ExpectedMessageLen:    1,
 		},
@@ -91,7 +106,7 @@ func TestInput_Validate(t *testing.T) {
 			ExpectedResult:        true,
 			ExpectedMessageLen:    0,
 		},
-		{Name: "`Input{Validators(1),Filters(1)}` (validator passing, filter passing, obscurer passing)",
+		{Name: "`Input{Validators(1),Filters(1),Obscurer}` (all passing)",
 			Input: func() *Input {
 				i := &Input{}
 				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
@@ -110,6 +125,110 @@ func TestInput_Validate(t *testing.T) {
 			ExpectedObscuredValue: "*****4321",
 			ExpectedResult:        true,
 			ExpectedMessageLen:    0,
+		},
+		{Name: "`Input{Validators(1),Filters(1),Obscurer}` (with validator failing)",
+			Input: func() *Input {
+				i := &Input{}
+				i.Validators = append(i.Validators, test.Validators[test.Last4Social])
+				i.Filters = append(i.Filters, func(x interface{}) interface{} {
+					return "00000" + x.(string)
+				})
+				i.Obscurer = func(x interface{}) interface{} {
+					return ecms_validator.ObscurateLeft(5, x.(string))
+				}
+				return i
+			}(),
+			IncomingValue:         "321",
+			ExpectedValue:         "321",
+			ExpectedRawValue:      "321",
+			ExpectedFilteredValue: "321",
+			ExpectedObscuredValue: "321",
+			ExpectedResult:        false,
+			ExpectedMessageLen:    1,
+		},
+		{Name: "`Input{Validators(1),Filters(1),Obscurer,Required}` (all passing)",
+			Input: func() *Input {
+				i := &Input{}
+				i.Required = true
+				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Filters = append(i.Filters, func(x interface{}) interface{} {
+					return 99
+				})
+				i.Obscurer = func(x interface{}) interface{} {
+					return "*" + strconv.Itoa(x.(int))[1:]
+				}
+				return i
+			}(),
+			IncomingValue:         1,
+			ExpectedValue:         99,
+			ExpectedRawValue:      1,
+			ExpectedFilteredValue: 99,
+			ExpectedObscuredValue: "*9",
+			ExpectedResult:        true,
+			ExpectedMessageLen:    0,
+		},
+		{Name: "`Input{Validators(1),Filters(1),Obscurer,Required}` (all passing)",
+			Input: func() *Input {
+				i := &Input{}
+				i.Required = true
+				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Filters = append(i.Filters, func(x interface{}) interface{} {
+					return "00000" + x.(string)
+				})
+				i.Obscurer = func(x interface{}) interface{} {
+					return ecms_validator.ObscurateLeft(5, x.(string))
+				}
+				return i
+			}(),
+			IncomingValue:         "4321",
+			ExpectedValue:         "000004321",
+			ExpectedRawValue:      "4321",
+			ExpectedFilteredValue: "000004321",
+			ExpectedObscuredValue: "*****4321",
+			ExpectedResult:        true,
+			ExpectedMessageLen:    0,
+		},
+		{Name: "`Input{Validators(1),Filters(1),Obscurer,Required}` (validators failing)",
+			Input: func() *Input {
+				i := &Input{}
+				i.Required = true
+				i.Validators = append(i.Validators, test.Validators[test.Last4Social])
+				i.Filters = append(i.Filters, func(x interface{}) interface{} {
+					return 99
+				})
+				i.Obscurer = func(x interface{}) interface{} {
+					return "*" + strconv.Itoa(x.(int))[1:]
+				}
+				return i
+			}(),
+			IncomingValue:         "1",
+			ExpectedValue:         "1",
+			ExpectedRawValue:      "1",
+			ExpectedFilteredValue: "1",
+			ExpectedObscuredValue: "1",
+			ExpectedResult:        false,
+			ExpectedMessageLen:    1,
+		},
+		{Name: "`Input{Validators(1),Filters(1),Obscurer,Required}` (validators failing)",
+			Input: func() *Input {
+				i := &Input{}
+				i.Required = true
+				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Filters = append(i.Filters, func(x interface{}) interface{} {
+					return "00000" + x.(string)
+				})
+				i.Obscurer = func(x interface{}) interface{} {
+					return ecms_validator.ObscurateLeft(5, x.(string))
+				}
+				return i
+			}(),
+			IncomingValue:         "",
+			ExpectedValue:         "",
+			ExpectedRawValue:      "",
+			ExpectedFilteredValue: "",
+			ExpectedObscuredValue: "",
+			ExpectedResult:        false,
+			ExpectedMessageLen:    1,
 		},
 	} {
 		t.Run(tc.Name, func(t2 *testing.T) {
