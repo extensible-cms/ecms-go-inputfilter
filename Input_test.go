@@ -40,6 +40,38 @@ func TestInput_Validate(t *testing.T) {
 			ExpectedObscuredValue: 20,
 			ExpectedResult:        true,
 		},
+		{Name: "Input{Validators}",
+			Input: func() Input {
+				i := Input{}
+				i.Validators = append(i.Validators, test.Validators[test.IdValidator])
+				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				return i
+			}(),
+			IncomingValue:         0,
+			ExpectedValue:         0,
+			ExpectedRawValue:      0,
+			ExpectedFilteredValue: 0,
+			ExpectedObscuredValue: 0,
+			ExpectedResult:        false,
+			ExpectedMessageLen:    2, // both validators should fail
+		},
+		{Name: "Input{Validators}",
+			Input: func() Input {
+				i := Input{}
+				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Filters = append(i.Filters, func (x interface{}) interface{} {
+					return 99
+				})
+				return i
+			}(),
+			IncomingValue:         0,
+			ExpectedValue:         99,
+			ExpectedRawValue:      0,
+			ExpectedFilteredValue: 99,
+			ExpectedObscuredValue: 99,
+			ExpectedResult:        false,
+			ExpectedMessageLen:    1, // both validators should fail
+		},
 	} {
 		t.Run(tc.Name, func(t2 *testing.T) {
 			result, messages, inputResult := tc.Input.Validate(tc.IncomingValue)

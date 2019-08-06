@@ -85,7 +85,8 @@ func RunFilters(i *Input, x interface{}) interface{} {
 func (i *Input) Validate(x interface{}) (bool, []string, InputResult) {
 	iResult := NewInputResult(i.Name, x)
 	vResult, messages := RunValidators(i, x)
-	iResult.FilteredValue = RunFilters(i, x)
+	iResult.Value = RunFilters(i, x)
+	iResult.FilteredValue = iResult.Value
 	iResult.ObscuredValue = iResult.FilteredValue
 
 	if i.Obscurer != nil {

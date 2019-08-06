@@ -13,22 +13,24 @@ const (
 	AliasValidator
 	NameValidator
 	DescriptionValidator
+	NotEmptyValidator
 )
 
 func init() {
 	idValidatorOps := ecms_validator.NewIntRangeValidatorOptions()
 	idValidatorOps.Min = 1
 	idValidatorOps.Max = 20
-
 	slugValidatorOps := ecms_validator.NewRegexValidatorOptions()
 	slugValidatorOps.Pattern = regexp.MustCompile("^[a-z][a-z_\\-\\d]{1,54}$")
 	slugValidator := ecms_validator.RegexValidator(slugValidatorOps)
+	notEmptyValidator := ecms_validator.NotEmptyValidator1()
 
 	Validators = map[int]ecms_validator.Validator{
-		IdValidator:    ecms_validator.IntRangeValidator(idValidatorOps),
-		SlugValidator:  slugValidator,
-		AliasValidator: slugValidator,
-		NameValidator:  slugValidator, // add name validator
+		IdValidator:          ecms_validator.IntRangeValidator(idValidatorOps),
+		SlugValidator:        slugValidator,
+		AliasValidator:       slugValidator,
+		NameValidator:        slugValidator, // add name validator
 		DescriptionValidator: slugValidator, // add description/content validator
+		NotEmptyValidator:    notEmptyValidator,
 	}
 }
