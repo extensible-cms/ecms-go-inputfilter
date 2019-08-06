@@ -11,18 +11,29 @@ type Input struct {
 	Filters        []Filter
 	Validators     []ecmsValidator.Validator
 	BreakOnFailure bool
-	Obscurer     Filter
+	Obscurer       Filter
 }
 
-type InputValueResult struct {
+type InputResult struct {
+	Name          string
+	Result        bool
+	messages      []string
 	Value         interface{}
 	RawValue      interface{}
 	ObscuredValue interface{}
 	FilteredValue interface{}
 }
 
-func NewInputValueResult(x interface{}) InputValueResult {
-	return InputValueResult{x, x, x, x}
+func NewInputResult(name string, x interface{}) InputResult {
+	return InputResult{
+		Name:          name,
+		Result:        false,
+		messages:      nil,
+		Value:         x,
+		RawValue:      x,
+		ObscuredValue: x,
+		FilteredValue: x,
+	}
 }
 
 type InputInterface interface {
@@ -30,20 +41,19 @@ type InputInterface interface {
 	AddValidators(validators []ecmsValidator.Validator)
 	AddFilter(fn func(interface{}) interface{})
 	AddFilters(filters []func(interface{}) interface{})
-	Validate(x interface{}) (bool, []string, InputValueResult)
-	Filter(x interface{}) interface{}
+	Validate(x interface{}) (bool, []string, InputResult)
 }
 
-func (i *Input) Validate(x interface{}) (bool, []string, InputValueResult) {
-	ivResult := InputValueResult{
-		Value:         x,
-		RawValue:      x,
-		ObscuredValue: x,
-		FilteredValue: x,
+func RunValidators(i *Input, x interface{}) (bool, []string) {
+	hasValidators := i.Validators != nil && len(i.Validators) > 0
+
+	if !i.Required && !hasValidators {
+		return true, nil
 	}
 
-	if i.Validators == nil || len(i.Validators) == 0 {
-		return true, nil, ivResult
+	if i.Required && !hasValidators {
+		// @todo add noempty validator
+		return false, []string{"\"" + i.Name + "\" is required.  Value received `nil`."}
 	}
 
 	vResult := true
@@ -58,19 +68,10 @@ func (i *Input) Validate(x interface{}) (bool, []string, InputValueResult) {
 			break
 		}
 	}
-
-	ivResult.FilteredValue = i.Filter(x)
-
-	if i.Obscurer != nil {
-		ivResult.ObscuredValue = i.Obscurer(x)
-	}
-
-	return vResult,
-		sliceof.SliceOfStringConcat(messageSlices),
-		ivResult
+	return vResult, sliceof.SliceOfStringConcat(messageSlices)
 }
 
-func (i *Input) Filter(x interface{}) interface{} {
+func RunFilters(i *Input, x interface{}) interface{} {
 	if i.Filters == nil {
 		return x
 	}
@@ -79,6 +80,21 @@ func (i *Input) Filter(x interface{}) interface{} {
 		last = f(last)
 	}
 	return last
+}
+
+func (i *Input) Validate(x interface{}) (bool, []string, InputResult) {
+	iResult := NewInputResult(i.Name, x)
+	vResult, messages := RunValidators(i, x)
+	iResult.FilteredValue = RunFilters(i, x)
+	iResult.ObscuredValue = iResult.FilteredValue
+
+	if i.Obscurer != nil {
+		iResult.ObscuredValue = i.Obscurer(x)
+	}
+
+	return vResult,
+		messages,
+		iResult
 }
 
 func (i *Input) AddValidator(fn ecmsValidator.Validator) {

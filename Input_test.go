@@ -42,13 +42,13 @@ func TestInput_Validate(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t2 *testing.T) {
-			result, messages, valueResult := tc.Input.Validate(tc.IncomingValue)
+			result, messages, inputResult := tc.Input.Validate(tc.IncomingValue)
 			test.ExpectEqual(t2, result, tc.ExpectedResult)
 			test.ExpectEqual(t2, len(messages), tc.ExpectedMessageLen)
-			test.ExpectEqual(t2, valueResult.Value, tc.ExpectedValue)
-			test.ExpectEqual(t2, valueResult.RawValue, tc.ExpectedRawValue)
-			test.ExpectEqual(t2, valueResult.FilteredValue, tc.ExpectedFilteredValue)
-			test.ExpectEqual(t2, valueResult.ObscuredValue, tc.ExpectedObscuredValue)
+			test.ExpectEqual(t2, inputResult.Value, tc.ExpectedValue)
+			test.ExpectEqual(t2, inputResult.RawValue, tc.ExpectedRawValue)
+			test.ExpectEqual(t2, inputResult.FilteredValue, tc.ExpectedFilteredValue)
+			test.ExpectEqual(t2, inputResult.ObscuredValue, tc.ExpectedObscuredValue)
 		})
 	}
 }
