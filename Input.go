@@ -25,6 +25,12 @@ type InputResult struct {
 	FilteredValue interface{}
 }
 
+func NewInput(name string) *Input {
+	return &Input{
+		Name: name,
+	}
+}
+
 func NewInputResult(name string, x interface{}) InputResult {
 	return InputResult{
 		Name:          name,
