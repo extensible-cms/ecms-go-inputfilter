@@ -1,4 +1,4 @@
-package test
+package ecms_go_inputfilter
 
 import (
 	ecms_validator "github.com/extensible-cms/ecms-go-validator"

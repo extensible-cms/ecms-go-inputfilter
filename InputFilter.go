@@ -26,17 +26,28 @@ type InputFilterResult struct {
 	invalidInputsAsList []*Input
 }
 
+func NewInputFilterResult() *InputFilterResult {
+	return &InputFilterResult{
+		true,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+	}
+}
+
 type InputFilterInterface interface {
 	Validate(data map[string]interface{})
 	AddInput(i *Input)
 	AddInputs(i []*Input)
 }
 
-func (inputF *InputFilter) Validate(d map[string]interface{}) InputFilterResult {
-	ir := InputFilterResult{}
+func (inputF *InputFilter) Validate(d *map[string]interface{}) InputFilterResult {
+	ir := NewInputFilterResult()
 
 	// @todo write body here
-	return ir
+	return *ir
 }
 
 func (inputF *InputFilter) AddInput(i *Input) error {

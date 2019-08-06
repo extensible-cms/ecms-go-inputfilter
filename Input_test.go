@@ -2,7 +2,6 @@ package ecms_go_inputfilter
 
 import (
 	"fmt"
-	"github.com/extensible-cms/ecms-go-inputfilter/test"
 	ecms_validator "github.com/extensible-cms/ecms-go-validator"
 	"strconv"
 	"testing"
@@ -48,7 +47,7 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(1)}` (validator passing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, test.Validators[test.IdValidator])
+				i.Validators = append(i.Validators, Validators[IdValidator])
 				return i
 			}(),
 			IncomingValue:         20,
@@ -61,8 +60,8 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(2)}` (validators failing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, test.Validators[test.IdValidator])
-				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[IdValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
 				return i
 			}(),
 			IncomingValue:         0,
@@ -76,7 +75,7 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(1),Filters(1)}` (validator failing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return 99
 				})
@@ -93,7 +92,7 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(1),Filters(1)}` (validator passing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return 99
 				})
@@ -110,7 +109,7 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(1),Filters(1),Obscurer}` (validator(s) passing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return "00000" + x.(string)
 				})
@@ -130,7 +129,7 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(1),Filters(1),Obscurer}` (with validator failing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, test.Validators[test.Last4Social])
+				i.Validators = append(i.Validators, Validators[Last4Social])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return "00000" + x.(string)
 				})
@@ -151,7 +150,7 @@ func TestInput_Validate(t *testing.T) {
 			Input: func() *Input {
 				i := &Input{}
 				i.Required = true
-				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return 99
 				})
@@ -172,7 +171,7 @@ func TestInput_Validate(t *testing.T) {
 			Input: func() *Input {
 				i := &Input{}
 				i.Required = true
-				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return "00000" + x.(string)
 				})
@@ -193,7 +192,7 @@ func TestInput_Validate(t *testing.T) {
 			Input: func() *Input {
 				i := &Input{}
 				i.Required = true
-				i.Validators = append(i.Validators, test.Validators[test.Last4Social])
+				i.Validators = append(i.Validators, Validators[Last4Social])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return 99
 				})
@@ -214,7 +213,7 @@ func TestInput_Validate(t *testing.T) {
 			Input: func() *Input {
 				i := &Input{}
 				i.Required = true
-				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return "00000" + x.(string)
 				})
@@ -236,8 +235,8 @@ func TestInput_Validate(t *testing.T) {
 				i := &Input{}
 				i.BreakOnFailure = true
 				// Validators will not run when value is `not required` and equal to `nil`
-				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
-				i.Validators = append(i.Validators, test.Validators[test.Last4Social])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[Last4Social])
 				return i
 			}(),
 			IncomingValue:         nil,
@@ -252,8 +251,8 @@ func TestInput_Validate(t *testing.T) {
 			Input: func() *Input {
 				i := &Input{}
 				i.BreakOnFailure = true
-				i.Validators = append(i.Validators, test.Validators[test.Last4Social])
-				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[Last4Social])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
 				return i
 			}(),
 			IncomingValue:         "",
@@ -267,12 +266,12 @@ func TestInput_Validate(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t2 *testing.T) {
 			result, messages, inputResult := tc.Input.Validate(tc.IncomingValue)
-			test.ExpectEqual(t2, "Result:", result, tc.ExpectedResult)
-			test.ExpectEqual(t2, "len(Messages):", len(messages), tc.ExpectedMessageLen)
-			test.ExpectEqual(t2, "Value:", inputResult.Value, tc.ExpectedValue)
-			test.ExpectEqual(t2, "RawValue:", inputResult.RawValue, tc.ExpectedRawValue)
-			test.ExpectEqual(t2, "FilteredValue:", inputResult.FilteredValue, tc.ExpectedFilteredValue)
-			test.ExpectEqual(t2, "ObscuredValue:", inputResult.ObscuredValue, tc.ExpectedObscuredValue)
+			ExpectEqual(t2, "Result:", result, tc.ExpectedResult)
+			ExpectEqual(t2, "len(Messages):", len(messages), tc.ExpectedMessageLen)
+			ExpectEqual(t2, "Value:", inputResult.Value, tc.ExpectedValue)
+			ExpectEqual(t2, "RawValue:", inputResult.RawValue, tc.ExpectedRawValue)
+			ExpectEqual(t2, "FilteredValue:", inputResult.FilteredValue, tc.ExpectedFilteredValue)
+			ExpectEqual(t2, "ObscuredValue:", inputResult.ObscuredValue, tc.ExpectedObscuredValue)
 		})
 	}
 }
@@ -311,7 +310,7 @@ func TestInput_AddFilter(t *testing.T) {
 			for _, f := range tc.Filters {
 				tc.Input.AddFilter(f)
 			}
-			test.ExpectEqual(t2, fmt.Sprintf("len(Input.Filters) === %v:", tc.ExpectedFiltersLen),
+			ExpectEqual(t2, fmt.Sprintf("len(Input.Filters) === %v:", tc.ExpectedFiltersLen),
 				len(tc.Input.Filters), tc.ExpectedFiltersLen)
 		})
 	}
@@ -319,7 +318,7 @@ func TestInput_AddFilter(t *testing.T) {
 	t.Run("Should not add 'nil' values", func(t2 *testing.T) {
 		i:= Input{}
 		i.AddFilter(nil)
-		test.ExpectEqual(t2, "len(Input.Filters) === 0;", len(i.Filters), 0)
+		ExpectEqual(t2, "len(Input.Filters) === 0;", len(i.Filters), 0)
 	})
 }
 
@@ -354,7 +353,7 @@ func TestInput_AddFilters(t *testing.T) {
 	}() {
 		t.Run(tc.Name, func(t2 *testing.T) {
 			tc.Input.AddFilters(tc.Filters)
-			test.ExpectEqual(t2, fmt.Sprintf("len(Input.Filters) === %v:", tc.ExpectedFiltersLen),
+			ExpectEqual(t2, fmt.Sprintf("len(Input.Filters) === %v:", tc.ExpectedFiltersLen),
 				len(tc.Input.Filters), tc.ExpectedFiltersLen)
 		})
 	}
@@ -362,7 +361,7 @@ func TestInput_AddFilters(t *testing.T) {
 	t.Run("Should not add 'nil' values", func(t2 *testing.T) {
 		i:= Input{}
 		i.AddFilters(nil)
-		test.ExpectEqual(t2, "len(Input.Filters) === 0;", len(i.Filters), 0)
+		ExpectEqual(t2, "len(Input.Filters) === 0;", len(i.Filters), 0)
 	})
 }
 
@@ -374,7 +373,7 @@ func TestInput_AddValidator(t *testing.T) {
 		ExpectedValidatorsLen int
 	}
 
-	notEmptyValidator := test.Validators[test.NotEmptyValidator]
+	notEmptyValidator := Validators[NotEmptyValidator]
 
 	for _, tc := range func() []TestCaseInputAddValidator {
 		out := make([]TestCaseInputAddValidator, 0)
@@ -398,7 +397,7 @@ func TestInput_AddValidator(t *testing.T) {
 			for _, f := range tc.Validators {
 				tc.Input.AddValidator(f)
 			}
-			test.ExpectEqual(t2, fmt.Sprintf("len(Input.Validators) === %v:", tc.ExpectedValidatorsLen),
+			ExpectEqual(t2, fmt.Sprintf("len(Input.Validators) === %v:", tc.ExpectedValidatorsLen),
 				len(tc.Input.Validators), tc.ExpectedValidatorsLen)
 		})
 	}
@@ -406,7 +405,7 @@ func TestInput_AddValidator(t *testing.T) {
 	t.Run("Should not add 'nil' values", func(t2 *testing.T) {
 		i:= Input{}
 		i.AddValidator(nil)
-		test.ExpectEqual(t2, "len(Input.Validators) === 0;", len(i.Validators), 0)
+		ExpectEqual(t2, "len(Input.Validators) === 0;", len(i.Validators), 0)
 	})	
 }
 
@@ -418,7 +417,7 @@ func TestInput_AddValidators(t *testing.T) {
 		ExpectedValidatorsLen int
 	}
 
-	notEmptyValidator := test.Validators[test.NotEmptyValidator]
+	notEmptyValidator := Validators[NotEmptyValidator]
 
 	for _, tc := range func() []TestCaseInputAddValidator {
 		out := make([]TestCaseInputAddValidator, 0)
@@ -439,7 +438,7 @@ func TestInput_AddValidators(t *testing.T) {
 	}() {
 		t.Run(tc.Name, func(t2 *testing.T) {
 			tc.Input.AddValidators(tc.Validators)
-			test.ExpectEqual(t2, fmt.Sprintf("len(Input.Validators) === %v:", tc.ExpectedValidatorsLen),
+			ExpectEqual(t2, fmt.Sprintf("len(Input.Validators) === %v:", tc.ExpectedValidatorsLen),
 				len(tc.Input.Validators), tc.ExpectedValidatorsLen)
 		})
 	}
@@ -447,6 +446,6 @@ func TestInput_AddValidators(t *testing.T) {
 	t.Run("Should not add 'nil' values", func(t2 *testing.T) {
 		i:= Input{}
 		i.AddValidators(nil)
-		test.ExpectEqual(t2, "len(Input.Validators) === 0;", len(i.Validators), 0)
+		ExpectEqual(t2, "len(Input.Validators) === 0;", len(i.Validators), 0)
 	})
 }
