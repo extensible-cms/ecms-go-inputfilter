@@ -409,7 +409,6 @@ func TestInput_AddValidator(t *testing.T) {
 	})	
 }
 
-
 func TestInput_AddValidators(t *testing.T) {
 	type TestCaseInputAddValidator struct {
 		Name               string

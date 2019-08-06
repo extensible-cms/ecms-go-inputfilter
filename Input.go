@@ -10,7 +10,7 @@ type Input struct {
 	Required        bool
 	Filters         []Filter
 	Validators      []ecmsValidator.Validator
-	//RequiredMessage string
+	RequiredMessage string
 	BreakOnFailure  bool
 	Obscurer        Filter
 }
@@ -53,8 +53,11 @@ func RunValidators(i *Input, x interface{}) (bool, []string) {
 	}
 
 	if i.Required && !hasValidators && x == nil {
-		// @todo add noempty validator
-		return false, []string{"\"" + i.Name + "\" is required.  Value received: `nil`."}
+		msg := i.RequiredMessage
+		if len(i.RequiredMessage) == 0 {
+			msg = "\"" + i.Name + "\" is required.  Value received: `nil`."
+		}
+		return false, []string{msg}
 	}
 
 	vResult := true

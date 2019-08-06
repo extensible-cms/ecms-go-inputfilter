@@ -1,7 +1,7 @@
 package ecms_go_inputfilter
 
 type InputFilter struct {
-	Inputs *map[string]*Input
+	Inputs map[string]*Input
 	BreakOnFailure bool
 }
 
