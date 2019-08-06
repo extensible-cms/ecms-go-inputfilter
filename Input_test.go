@@ -2,6 +2,7 @@ package ecms_go_inputfilter
 
 import (
 	"github.com/extensible-cms/ecms-go-inputfilter/test"
+	ecms_validator "github.com/extensible-cms/ecms-go-validator"
 	"testing"
 )
 
@@ -98,7 +99,7 @@ func TestInput_Validate(t *testing.T) {
 					return "00000" + x.(string)
 				})
 				i.Obscurer = func(x interface{}) interface{} {
-					return "*****" + x.(string)[5:]
+					return ecms_validator.ObscurateLeft(5, x.(string))
 				}
 				return i
 			}(),
