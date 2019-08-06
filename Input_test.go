@@ -72,7 +72,7 @@ func TestInput_Validate(t *testing.T) {
 			ExpectedResult:        false,
 			ExpectedMessageLen:    2, // both validators should fail
 		},
-		{Name: "`Input{Validators(1),Filters(1)}` (validator failing, filter passing)",
+		{Name: "`Input{Validators(1),Filters(1)}` (validator failing)",
 			Input: func() *Input {
 				i := &Input{}
 				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
@@ -89,7 +89,7 @@ func TestInput_Validate(t *testing.T) {
 			ExpectedResult:        false,
 			ExpectedMessageLen:    1,
 		},
-		{Name: "`Input{Validators(1),Filters(1)}` (validator passing, filter passing)",
+		{Name: "`Input{Validators(1),Filters(1)}` (validator passing)",
 			Input: func() *Input {
 				i := &Input{}
 				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
@@ -106,7 +106,7 @@ func TestInput_Validate(t *testing.T) {
 			ExpectedResult:        true,
 			ExpectedMessageLen:    0,
 		},
-		{Name: "`Input{Validators(1),Filters(1),Obscurer}` (all passing)",
+		{Name: "`Input{Validators(1),Filters(1),Obscurer}` (validator(s) passing)",
 			Input: func() *Input {
 				i := &Input{}
 				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
@@ -220,6 +220,38 @@ func TestInput_Validate(t *testing.T) {
 				i.Obscurer = func(x interface{}) interface{} {
 					return ecms_validator.ObscurateLeft(5, x.(string))
 				}
+				return i
+			}(),
+			IncomingValue:         "",
+			ExpectedValue:         "",
+			ExpectedRawValue:      "",
+			ExpectedFilteredValue: "",
+			ExpectedObscuredValue: "",
+			ExpectedResult:        false,
+			ExpectedMessageLen:    1,
+		},
+		{Name: "`Input{Validators(1),BreakOnFailure}` (validators failing)",
+			Input: func() *Input {
+				i := &Input{}
+				i.BreakOnFailure = true
+				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
+				i.Validators = append(i.Validators, test.Validators[test.Last4Social])
+				return i
+			}(),
+			IncomingValue:         nil,
+			ExpectedValue:         nil,
+			ExpectedRawValue:      nil,
+			ExpectedFilteredValue: nil,
+			ExpectedObscuredValue: nil,
+			ExpectedResult:        false,
+			ExpectedMessageLen:    1,
+		},
+		{Name: "`Input{Validators(1),BreakOnFailure}` (validators passing)",
+			Input: func() *Input {
+				i := &Input{}
+				i.BreakOnFailure = true
+				i.Validators = append(i.Validators, test.Validators[test.Last4Social])
+				i.Validators = append(i.Validators, test.Validators[test.NotEmptyValidator])
 				return i
 			}(),
 			IncomingValue:         "",
