@@ -5,58 +5,63 @@ import (
 	"regexp"
 )
 
-var Validators map[int]ecms_validator.Validator
+var (
+	Validators map[int]ecms_validator.Validator
+)
+
 
 const (
-	IdValidator = iota
-	SlugValidator
-	AliasValidator
-	NameValidator
-	DescriptionValidator
-	NotEmptyValidator
-	Last4Social
-	EmailValidator
-	DigitValidator
+	IdValidatorKey = iota
+	SlugValidatorKey
+	AliasValidatorKey
+	NameValidatorKey
+	DescriptionValidatorKey
+	NotEmptyValidatorKey
+	Last4SocialKey
+	EmailValidatorKey
+	DigitValidatorKey
 )
 
 func init() {
-	idValidatorOps := ecms_validator.NewIntRangeValidatorOptions()
-	idValidatorOps.Min = 1
-	idValidatorOps.Max = 20
+	IdValidatorOps := ecms_validator.NewIntRangeValidatorOptions()
+	IdValidatorOps.Min = 1
+	IdValidatorOps.Max = 20
+	IdValidator := ecms_validator.IntRangeValidator(IdValidatorOps)
 
-	descrLenValidatorOps := ecms_validator.NewIntRangeValidatorOptions()
-	descrLenValidatorOps.Min = 1
-	descrLenValidatorOps.Max = 2048
-	descrLenValidator := ecms_validator.IntRangeValidator(descrLenValidatorOps)
+	DescrLenValidatorOps := ecms_validator.NewIntRangeValidatorOptions()
+	DescrLenValidatorOps.Min = 1
+	DescrLenValidatorOps.Max = 2048
+	DescrLenValidator := ecms_validator.IntRangeValidator(DescrLenValidatorOps)
 
 	slugValidatorOps := ecms_validator.NewRegexValidatorOptions()
-	slugValidatorOps.Pattern = regexp.MustCompile("^[a-z][a-z_\\-\\d]{1,54}$")
-	slugValidator := ecms_validator.RegexValidator(slugValidatorOps)
+	slugValidatorOps.Pattern = regexp.MustCompile("^[a-z][a-z_\\-\\d]{1,54}$i")
+	SlugValidator :=  ecms_validator.RegexValidator(slugValidatorOps)
+
 	nameValidatorOps := ecms_validator.NewRegexValidatorOptions()
-	nameValidatorOps.Pattern = regexp.MustCompile("^[a-z][a-z_\\s'\"]{1,54}$")
-	nameValidator := ecms_validator.RegexValidator(nameValidatorOps)
+	nameValidatorOps.Pattern = regexp.MustCompile("^[a-z][a-z\\s'\"]{5,54}$i")
+	NameValidator :=  ecms_validator.RegexValidator(nameValidatorOps)
 
-	notEmptyValidator := ecms_validator.NotEmptyValidator1()
+	NotEmptyValidator :=  ecms_validator.NotEmptyValidator1()
 
-	last4SocialValidatorOps := ecms_validator.NewRegexValidatorOptions()
+	last4SocialValidatorOps :=  ecms_validator.NewRegexValidatorOptions()
 	last4SocialValidatorOps.Pattern = regexp.MustCompile("^\\d{4}$")
-	last4SocialValidator := ecms_validator.RegexValidator(last4SocialValidatorOps)
+	Last4SocialValidator :=  ecms_validator.RegexValidator(last4SocialValidatorOps)
 
 	fakeEmailValidatorOps := ecms_validator.NewRegexValidatorOptions()
-	fakeEmailValidatorOps.Pattern = regexp.MustCompile("^[^\\@]{1,89}\\@[^\\@]{1,89}$")
-	fakeEmailValidator := ecms_validator.RegexValidator(fakeEmailValidatorOps)
+	fakeEmailValidatorOps.Pattern = regexp.MustCompile("^[^@]{1,55}@[^@]{1,55}$")
+	FakeEmailValidator :=  ecms_validator.RegexValidator(fakeEmailValidatorOps)
 
-	digitValidator := ecms_validator.DigitValidator1()
+	DigitValidator :=  ecms_validator.DigitValidator1()
 
 	Validators = map[int]ecms_validator.Validator{
-		IdValidator:          ecms_validator.IntRangeValidator(idValidatorOps),
-		SlugValidator:        slugValidator,
-		AliasValidator:       slugValidator,
-		NameValidator:        nameValidator, // add name validator
-		DescriptionValidator: descrLenValidator, // add description/content validator
-		NotEmptyValidator:    notEmptyValidator,
-		Last4Social:          last4SocialValidator,
-		EmailValidator:       fakeEmailValidator, // over-simplified version of email validation (not for production!!!)
-		DigitValidator:       digitValidator,
+		IdValidatorKey:          IdValidator,
+		SlugValidatorKey:        SlugValidator,
+		AliasValidatorKey:       SlugValidator,
+		NameValidatorKey:        NameValidator,     // add name validator
+		DescriptionValidatorKey: DescrLenValidator, // add description/content validator
+		NotEmptyValidatorKey:    NotEmptyValidator,
+		Last4SocialKey:          Last4SocialValidator,
+		EmailValidatorKey:       FakeEmailValidator, // over-simplified version of email validation (not for production!!!)
+		DigitValidatorKey:       DigitValidator,
 	}
 }

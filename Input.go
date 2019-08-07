@@ -22,13 +22,13 @@ func NewInput(name string) *Input {
 }
 
 type InputResult struct {
-	Name          string
-	Result        bool
-	Messages      []string
-	Value         interface{}
-	RawValue      interface{}
-	ObscuredValue interface{}
-	FilteredValue interface{}
+	Name          string      `json:"name"`
+	Result        bool        `json:"result"`
+	Messages      []string    `json:"messages"`
+	Value         interface{} `json:"value"`
+	RawValue      interface{} `json:"rawValue"`
+	ObscuredValue interface{} `json:"obscuredValue"`
+	FilteredValue interface{} `json:"filteredValue"`
 }
 
 func NewInputResult(name string, x interface{}) InputResult {
