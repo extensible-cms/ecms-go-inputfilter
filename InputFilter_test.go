@@ -79,7 +79,7 @@ func TestInputFilter_Validate(t *testing.T) {
 			&ContactFormInputFilter,
 			map[string]interface{}{
 				"name":    "Hello World",
-				"email":   "abcabc.com",
+				"email":   "abc@abc.com",
 				"message": "Some description here.",
 			},
 			NewInputFilterResult(),
@@ -88,7 +88,7 @@ func TestInputFilter_Validate(t *testing.T) {
 		t.Run(tc.Name, func(t2 *testing.T) {
 			resultF := tc.InputFilter.Validate(tc.Data)
 			ExpectEqual(t2, "Result:", resultF.Result, tc.Expected.Result)
-			t2.Logf("%v", resultF)
+			t2.Logf("%v", resultF.InvalidResults["name"])
 		})
 	}
 }

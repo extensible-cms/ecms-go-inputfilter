@@ -47,7 +47,7 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(1)}` (validator passing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, Validators[IdValidator])
+				i.Validators = append(i.Validators, Validators[IdValidatorKey])
 				return i
 			}(),
 			IncomingValue:         20,
@@ -60,8 +60,8 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(2)}` (validators failing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, Validators[IdValidator])
-				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[IdValidatorKey])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidatorKey])
 				return i
 			}(),
 			IncomingValue:         0,
@@ -75,7 +75,7 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(1),Filters(1)}` (validator failing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidatorKey])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return 99
 				})
@@ -92,7 +92,7 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(1),Filters(1)}` (validator passing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidatorKey])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return 99
 				})
@@ -109,7 +109,7 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(1),Filters(1),Obscurer}` (validator(s) passing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidatorKey])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return "00000" + x.(string)
 				})
@@ -129,7 +129,7 @@ func TestInput_Validate(t *testing.T) {
 		{Name: "`Input{Validators(1),Filters(1),Obscurer}` (with validator failing)",
 			Input: func() *Input {
 				i := &Input{}
-				i.Validators = append(i.Validators, Validators[Last4Social])
+				i.Validators = append(i.Validators, Validators[Last4SocialKey])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return "00000" + x.(string)
 				})
@@ -150,7 +150,7 @@ func TestInput_Validate(t *testing.T) {
 			Input: func() *Input {
 				i := &Input{}
 				i.Required = true
-				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidatorKey])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return 99
 				})
@@ -171,7 +171,7 @@ func TestInput_Validate(t *testing.T) {
 			Input: func() *Input {
 				i := &Input{}
 				i.Required = true
-				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidatorKey])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return "00000" + x.(string)
 				})
@@ -192,7 +192,7 @@ func TestInput_Validate(t *testing.T) {
 			Input: func() *Input {
 				i := &Input{}
 				i.Required = true
-				i.Validators = append(i.Validators, Validators[Last4Social])
+				i.Validators = append(i.Validators, Validators[Last4SocialKey])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return 99
 				})
@@ -213,7 +213,7 @@ func TestInput_Validate(t *testing.T) {
 			Input: func() *Input {
 				i := &Input{}
 				i.Required = true
-				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidatorKey])
 				i.Filters = append(i.Filters, func(x interface{}) interface{} {
 					return "00000" + x.(string)
 				})
@@ -235,8 +235,8 @@ func TestInput_Validate(t *testing.T) {
 				i := &Input{}
 				i.BreakOnFailure = true
 				// Validators will not run when value is `not required` and equal to `nil`
-				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
-				i.Validators = append(i.Validators, Validators[Last4Social])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidatorKey])
+				i.Validators = append(i.Validators, Validators[Last4SocialKey])
 				return i
 			}(),
 			IncomingValue:         nil,
@@ -251,8 +251,8 @@ func TestInput_Validate(t *testing.T) {
 			Input: func() *Input {
 				i := &Input{}
 				i.BreakOnFailure = true
-				i.Validators = append(i.Validators, Validators[Last4Social])
-				i.Validators = append(i.Validators, Validators[NotEmptyValidator])
+				i.Validators = append(i.Validators, Validators[Last4SocialKey])
+				i.Validators = append(i.Validators, Validators[NotEmptyValidatorKey])
 				return i
 			}(),
 			IncomingValue:         "",
@@ -373,7 +373,7 @@ func TestInput_AddValidator(t *testing.T) {
 		ExpectedValidatorsLen int
 	}
 
-	notEmptyValidator := Validators[NotEmptyValidator]
+	notEmptyValidator := Validators[NotEmptyValidatorKey]
 
 	for _, tc := range func() []TestCaseInputAddValidator {
 		out := make([]TestCaseInputAddValidator, 0)
@@ -417,7 +417,7 @@ func TestInput_AddValidators(t *testing.T) {
 		ExpectedValidatorsLen int
 	}
 
-	notEmptyValidator := Validators[NotEmptyValidator]
+	notEmptyValidator := Validators[NotEmptyValidatorKey]
 
 	for _, tc := range func() []TestCaseInputAddValidator {
 		out := make([]TestCaseInputAddValidator, 0)

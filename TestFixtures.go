@@ -1,51 +1,66 @@
 package ecms_go_inputfilter
 
 import (
+	"fmt"
 	ecms_validator "github.com/extensible-cms/ecms-go-validator"
+	"regexp"
 )
 
-var ContactFormInputFilter InputFilter
+var (
+	ContactFormInputFilter InputFilter
+	NameInput *Input
+	EmailInput *Input
+	SubjInput *Input
+	MessageInput *Input
+)
 
 func init() {
-	nameInput := NewInput("name")
-	nameInput.Required = true
-	nameInput.RequiredMessage = "Name is required."
-	nameInput.AddValidator(Validators[NameValidator])
+	nameValidatorOps := ecms_validator.NewRegexValidatorOptions()
+	nameValidatorOps.Pattern = regexp.MustCompile("^[a-zA-Z][a-zA-Z\\s'\"]{4,54}$")
+	NameValidator := ecms_validator.RegexValidator(nameValidatorOps)
 
-	emailInput := NewInput("email")
-	emailInput.Required = true
-	emailInput.RequiredMessage = "Email is required."
-	emailInput.AddValidator(Validators[EmailValidator])
+	nametestRslt, nametestMsgs := NameValidator("abcd")
+	fmt.Printf("nametestMsgs: %v; nametest: %v", nametestMsgs, nametestRslt)
 
-	//phoneInput := NewInput("phone")
-	//phoneInput.AddValidator(func() ecms_validator.Validator {
-	//	lenOps := ecms_validator.NewLengthValidatorOptions()
-	//	lenOps.Min = 10
-	//	lenOps.Max = 10
-	//	return ecms_validator.LengthValidator(lenOps)
-	//}())
-	//phoneInput.AddValidator(Validators[DigitValidator])
+	NameInput = NewInput("name")
+	NameInput.Required = true
+	NameInput.RequiredMessage = "Name is required."
+	NameInput.AddValidator(NameValidator)
 
-	subjInput := NewInput("subject")
-	subjInput.AddValidator(func() ecms_validator.Validator {
+	EmailInput = NewInput("email")
+	EmailInput.Required = true
+	EmailInput.RequiredMessage = "Email is required."
+
+	fakeEmailValidatorOps := ecms_validator.NewRegexValidatorOptions()
+	fakeEmailValidatorOps.Pattern = regexp.MustCompile("^[^@]{1,55}@[^@]{1,55}$")
+	fakeEmailValidator := ecms_validator.RegexValidator(fakeEmailValidatorOps)
+
+	EmailInput.AddValidator(fakeEmailValidator)
+
+	DescrLenValidatorOps := ecms_validator.NewIntRangeValidatorOptions()
+	DescrLenValidatorOps.Min = 1
+	DescrLenValidatorOps.Max = 2048
+	DescrLenValidator := ecms_validator.IntRangeValidator(DescrLenValidatorOps)
+
+	SubjInput = NewInput("subject")
+	SubjInput.AddValidator(func() ecms_validator.Validator {
 		lenOps := ecms_validator.NewLengthValidatorOptions()
 		lenOps.Min = 3
 		lenOps.Max = 55
 		return ecms_validator.LengthValidator(lenOps)
 	}())
-	subjInput.AddValidator(Validators[DescriptionValidator])
 
-	msgInput := NewInput("message")
-	msgInput.Required = true
-	msgInput.RequiredMessage = "Message is required."
-	msgInput.AddValidator(Validators[DescriptionValidator])
+	MessageInput = NewInput("message")
+	MessageInput.Required = true
+	MessageInput.RequiredMessage = "Message is required."
+	MessageInput.AddValidator(DescrLenValidator)
 
 	ContactFormInputFilter = InputFilter{
 		Inputs: map[string]*Input{
-			nameInput.Name:  nameInput,
-			emailInput.Name: emailInput,
-			subjInput.Name:  subjInput,
-			msgInput.Name:   msgInput,
+			NameInput.Name:    NameInput,
+			EmailInput.Name:   EmailInput,
+			SubjInput.Name:    SubjInput,
+			MessageInput.Name: MessageInput,
 		},
 		BreakOnFailure: false, // validate all inputs
 	}

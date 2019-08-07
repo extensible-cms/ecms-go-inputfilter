@@ -18,10 +18,10 @@ func NewInputFilter() *InputFilter {
 }
 
 type InputFilterResult struct {
-	Result         bool
-	Messages       map[string][]string
-	ValidResults   map[string]InputResult
-	InvalidResults map[string]InputResult
+	Result         bool 					`json:"result"`
+	Messages       map[string][]string		`json:"messages"`
+	ValidResults   map[string]InputResult	`json:"validResults"`	
+	InvalidResults map[string]InputResult	`json:"invalidResults"`
 }
 
 func NewInputFilterResult() *InputFilterResult {
