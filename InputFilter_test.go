@@ -69,7 +69,7 @@ func TestInputFilter_Validate(t *testing.T) {
 	type TestCaseInputFilterValidate struct {
 		Name        string
 		InputFilter *InputFilter
-		Data        *map[string]interface{}
+		Data        map[string]interface{}
 		Expected    *InputFilterResult
 	}
 
@@ -77,11 +77,9 @@ func TestInputFilter_Validate(t *testing.T) {
 		{
 			"Only required fields (should pass)",
 			&ContactFormInputFilter,
-			&map[string]interface{}{
+			map[string]interface{}{
 				"name":    "Hello World",
-				"email":   "abc@abc.com",
-				"subj":    "Some subject here.",
-				"phone":   "1231231234", // not required
+				"email":   "abcabc.com",
 				"message": "Some description here.",
 			},
 			NewInputFilterResult(),

@@ -24,7 +24,7 @@ func NewInput(name string) *Input {
 type InputResult struct {
 	Name          string
 	Result        bool
-	messages      []string
+	Messages      []string
 	Value         interface{}
 	RawValue      interface{}
 	ObscuredValue interface{}
@@ -34,8 +34,8 @@ type InputResult struct {
 func NewInputResult(name string, x interface{}) InputResult {
 	return InputResult{
 		Name:          name,
-		Result:        false,
-		messages:      nil,
+		Result:        true,
+		Messages:      nil,
 		Value:         x,
 		RawValue:      x,
 		ObscuredValue: x,
@@ -106,6 +106,9 @@ func (i *Input) Validate(x interface{}) (bool, []string, InputResult) {
 			iResult.ObscuredValue = i.Obscurer(iResult.FilteredValue)
 		}
 	}
+
+	iResult.Result = vResult
+	iResult.Messages = messages
 
 	return vResult,
 		messages,

@@ -10,27 +10,23 @@ type InputFilter struct {
 	BreakOnFailure bool
 }
 
-func NewInputFilter () *InputFilter {
+func NewInputFilter() *InputFilter {
 	return &InputFilter{
-		Inputs: make(map[string]*Input),
+		Inputs:         make(map[string]*Input),
 		BreakOnFailure: false,
 	}
 }
 
 type InputFilterResult struct {
-	Result              bool
-	Messages            map[string][]string
-	validInputs         map[string]*Input
-	invalidInputs       map[string]*Input
-	validInputsAsList   []*Input
-	invalidInputsAsList []*Input
+	Result         bool
+	Messages       map[string][]string
+	ValidResults   map[string]InputResult
+	InvalidResults map[string]InputResult
 }
 
 func NewInputFilterResult() *InputFilterResult {
 	return &InputFilterResult{
 		true,
-		nil,
-		nil,
 		nil,
 		nil,
 		nil,
@@ -43,11 +39,39 @@ type InputFilterInterface interface {
 	AddInputs(i []*Input)
 }
 
-func (inputF *InputFilter) Validate(d *map[string]interface{}) InputFilterResult {
-	ir := NewInputFilterResult()
+func (inputF *InputFilter) Validate(d map[string]interface{}) InputFilterResult {
+	ir := *NewInputFilterResult()
+	inputFInputsLen := len(inputF.Inputs)
 
-	// @todo write body here
-	return *ir
+	if len(d) == 0 && inputFInputsLen == 0 {
+		ir.Result = true
+		return ir
+	}
+
+	messages := make(map[string][]string)
+	validResults := make(map[string]InputResult)
+	invalidResults := make(map[string]InputResult)
+	vResult := true
+
+	// Validate inputs
+	for _, i := range inputF.Inputs {
+		rslt, msgs, inputValueRslt := i.Validate(d[i.Name])
+
+		if !rslt {
+			vResult = false
+			invalidResults[i.Name] = inputValueRslt
+			messages[i.Name] = msgs
+		}
+		if rslt {
+			validResults[i.Name] = inputValueRslt
+		}
+	}
+
+	ir.Result = vResult
+	ir.InvalidResults = invalidResults
+	ir.ValidResults = validResults
+
+	return ir
 }
 
 func (inputF *InputFilter) AddInput(i *Input) error {

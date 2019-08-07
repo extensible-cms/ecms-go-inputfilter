@@ -17,14 +17,14 @@ func init() {
 	emailInput.RequiredMessage = "Email is required."
 	emailInput.AddValidator(Validators[EmailValidator])
 
-	phoneInput := NewInput("phone")
-	phoneInput.AddValidator(func() ecms_validator.Validator {
-		lenOps := ecms_validator.NewLengthValidatorOptions()
-		lenOps.Min = 10
-		lenOps.Max = 10
-		return ecms_validator.LengthValidator(lenOps)
-	}())
-	phoneInput.AddValidator(Validators[DigitValidator])
+	//phoneInput := NewInput("phone")
+	//phoneInput.AddValidator(func() ecms_validator.Validator {
+	//	lenOps := ecms_validator.NewLengthValidatorOptions()
+	//	lenOps.Min = 10
+	//	lenOps.Max = 10
+	//	return ecms_validator.LengthValidator(lenOps)
+	//}())
+	//phoneInput.AddValidator(Validators[DigitValidator])
 
 	subjInput := NewInput("subject")
 	subjInput.AddValidator(func() ecms_validator.Validator {

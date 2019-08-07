@@ -24,9 +24,17 @@ func init() {
 	idValidatorOps.Min = 1
 	idValidatorOps.Max = 20
 
+	descrLenValidatorOps := ecms_validator.NewIntRangeValidatorOptions()
+	descrLenValidatorOps.Min = 1
+	descrLenValidatorOps.Max = 2048
+	descrLenValidator := ecms_validator.IntRangeValidator(descrLenValidatorOps)
+
 	slugValidatorOps := ecms_validator.NewRegexValidatorOptions()
 	slugValidatorOps.Pattern = regexp.MustCompile("^[a-z][a-z_\\-\\d]{1,54}$")
 	slugValidator := ecms_validator.RegexValidator(slugValidatorOps)
+	nameValidatorOps := ecms_validator.NewRegexValidatorOptions()
+	nameValidatorOps.Pattern = regexp.MustCompile("^[a-z][a-z_\\s'\"]{1,54}$")
+	nameValidator := ecms_validator.RegexValidator(nameValidatorOps)
 
 	notEmptyValidator := ecms_validator.NotEmptyValidator1()
 
@@ -35,7 +43,7 @@ func init() {
 	last4SocialValidator := ecms_validator.RegexValidator(last4SocialValidatorOps)
 
 	fakeEmailValidatorOps := ecms_validator.NewRegexValidatorOptions()
-	fakeEmailValidatorOps.Pattern = regexp.MustCompile("^[^@]{1,89}@[^@]{1,89}$")
+	fakeEmailValidatorOps.Pattern = regexp.MustCompile("^[^\\@]{1,89}\\@[^\\@]{1,89}$")
 	fakeEmailValidator := ecms_validator.RegexValidator(fakeEmailValidatorOps)
 
 	digitValidator := ecms_validator.DigitValidator1()
@@ -44,8 +52,8 @@ func init() {
 		IdValidator:          ecms_validator.IntRangeValidator(idValidatorOps),
 		SlugValidator:        slugValidator,
 		AliasValidator:       slugValidator,
-		NameValidator:        slugValidator, // add name validator
-		DescriptionValidator: slugValidator, // add description/content validator
+		NameValidator:        nameValidator, // add name validator
+		DescriptionValidator: descrLenValidator, // add description/content validator
 		NotEmptyValidator:    notEmptyValidator,
 		Last4Social:          last4SocialValidator,
 		EmailValidator:       fakeEmailValidator, // over-simplified version of email validation (not for production!!!)
