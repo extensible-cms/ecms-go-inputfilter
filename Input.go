@@ -47,7 +47,7 @@ type InputInterface interface {
 	AddValidators(validators []ecmsValidator.Validator)
 	AddFilter(fn func(interface{}) interface{})
 	AddFilters(filters []func(interface{}) interface{})
-	Validate(x interface{}) (bool, []string, InputResult)
+	Validate(x interface{}) InputResult
 }
 
 func RunValidators(i *Input, x interface{}) (bool, []string) {
@@ -92,7 +92,7 @@ func RunFilters(i *Input, x interface{}) interface{} {
 	return last
 }
 
-func (i *Input) Validate(x interface{}) (bool, []string, InputResult) {
+func (i *Input) Validate(x interface{}) InputResult {
 	iResult := NewInputResult(i.Name, x)
 	vResult, messages := RunValidators(i, x)
 
@@ -109,9 +109,7 @@ func (i *Input) Validate(x interface{}) (bool, []string, InputResult) {
 	iResult.Result = vResult
 	iResult.Messages = messages
 
-	return vResult,
-		messages,
-		iResult
+	return iResult
 }
 
 func (i *Input) AddValidator(fn ecmsValidator.Validator) {

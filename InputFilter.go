@@ -62,19 +62,19 @@ func (inputF *InputFilter) Validate(d map[string]interface{}) InputFilterResult 
 			continue
 		}
 
-		rslt, msgs, inputValueRslt := i.Validate(d[i.Name])
+		inputValueRslt := i.Validate(d[i.Name])
 
-		if !rslt {
+		if !inputValueRslt.Result {
 			vResult = false
 			invalidResults[i.Name] = inputValueRslt
-			messages[i.Name] = msgs
+			messages[i.Name] = inputValueRslt.Messages
 
 			if inputF.BreakOnFailure {
 				ir.Result = vResult
 				return ir
 			}
 		}
-		if rslt {
+		if inputValueRslt.Result {
 			validResults[i.Name] = inputValueRslt
 		}
 	}

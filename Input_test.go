@@ -2,7 +2,7 @@ package ecms_go_inputfilter
 
 import (
 	"fmt"
-	ecms_validator "github.com/extensible-cms/ecms-go-validator"
+	ecmsValidator "github.com/extensible-cms/ecms-go-validator"
 	"strconv"
 	"testing"
 )
@@ -114,7 +114,7 @@ func TestInput_Validate(t *testing.T) {
 					return "00000" + x.(string)
 				})
 				i.Obscurer = func(x interface{}) interface{} {
-					return ecms_validator.ObscurateLeft(5, x.(string))
+					return ecmsValidator.ObscurateLeft(5, x.(string))
 				}
 				return i
 			}(),
@@ -134,7 +134,7 @@ func TestInput_Validate(t *testing.T) {
 					return "00000" + x.(string)
 				})
 				i.Obscurer = func(x interface{}) interface{} {
-					return ecms_validator.ObscurateLeft(5, x.(string))
+					return ecmsValidator.ObscurateLeft(5, x.(string))
 				}
 				return i
 			}(),
@@ -176,7 +176,7 @@ func TestInput_Validate(t *testing.T) {
 					return "00000" + x.(string)
 				})
 				i.Obscurer = func(x interface{}) interface{} {
-					return ecms_validator.ObscurateLeft(5, x.(string))
+					return ecmsValidator.ObscurateLeft(5, x.(string))
 				}
 				return i
 			}(),
@@ -218,7 +218,7 @@ func TestInput_Validate(t *testing.T) {
 					return "00000" + x.(string)
 				})
 				i.Obscurer = func(x interface{}) interface{} {
-					return ecms_validator.ObscurateLeft(5, x.(string))
+					return ecmsValidator.ObscurateLeft(5, x.(string))
 				}
 				return i
 			}(),
@@ -265,9 +265,9 @@ func TestInput_Validate(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t2 *testing.T) {
-			result, messages, inputResult := tc.Input.Validate(tc.IncomingValue)
-			ExpectEqual(t2, "Result:", result, tc.ExpectedResult)
-			ExpectEqual(t2, "len(Messages):", len(messages), tc.ExpectedMessageLen)
+			inputResult := tc.Input.Validate(tc.IncomingValue)
+			ExpectEqual(t2, "Result:", inputResult.Result, tc.ExpectedResult)
+			ExpectEqual(t2, "len(Messages):", len(inputResult.Messages), tc.ExpectedMessageLen)
 			ExpectEqual(t2, "Value:", inputResult.Value, tc.ExpectedValue)
 			ExpectEqual(t2, "RawValue:", inputResult.RawValue, tc.ExpectedRawValue)
 			ExpectEqual(t2, "FilteredValue:", inputResult.FilteredValue, tc.ExpectedFilteredValue)
@@ -291,7 +291,7 @@ func TestInput_AddFilter(t *testing.T) {
 	for _, tc := range func() []TestCaseInputAddFilter {
 		out := make([]TestCaseInputAddFilter, 0)
 		rangeStr := "aeiou"
-		for i, _ := range rangeStr {
+		for i := range rangeStr {
 			input := &Input{}
 			filters := make([]Filter, 0)
 			for j := 0; j < i+1; j += 1 {
@@ -336,7 +336,7 @@ func TestInput_AddFilters(t *testing.T) {
 
 	for _, tc := range func() []TestCaseInputAddFilter {
 		out := make([]TestCaseInputAddFilter, 0)
-		for i, _ := range "aeiou" {
+		for i := range "aeiou" {
 			input := &Input{}
 			filters := make([]Filter, 0)
 			for j := 0; j < i+1; j += 1 {
@@ -369,7 +369,7 @@ func TestInput_AddValidator(t *testing.T) {
 	type TestCaseInputAddValidator struct {
 		Name               string
 		Input              *Input
-		Validators            []ecms_validator.Validator
+		Validators            []ecmsValidator.Validator
 		ExpectedValidatorsLen int
 	}
 
@@ -378,9 +378,9 @@ func TestInput_AddValidator(t *testing.T) {
 	for _, tc := range func() []TestCaseInputAddValidator {
 		out := make([]TestCaseInputAddValidator, 0)
 		rangeStr := "aeiou"
-		for i, _ := range rangeStr {
+		for i := range rangeStr {
 			input := &Input{}
-			validators := make([]ecms_validator.Validator, 0)
+			validators := make([]ecmsValidator.Validator, 0)
 			for j := 0; j < i+1; j += 1 {
 				validators = append(validators, notEmptyValidator)
 			}
@@ -413,7 +413,7 @@ func TestInput_AddValidators(t *testing.T) {
 	type TestCaseInputAddValidator struct {
 		Name               string
 		Input              *Input
-		Validators            []ecms_validator.Validator
+		Validators            []ecmsValidator.Validator
 		ExpectedValidatorsLen int
 	}
 
@@ -421,9 +421,9 @@ func TestInput_AddValidators(t *testing.T) {
 
 	for _, tc := range func() []TestCaseInputAddValidator {
 		out := make([]TestCaseInputAddValidator, 0)
-		for i, _ := range "aeiou" {
+		for i := range "aeiou" {
 			input := &Input{}
-			validators := make([]ecms_validator.Validator, 0)
+			validators := make([]ecmsValidator.Validator, 0)
 			for j := 0; j < i+1; j += 1 {
 				validators = append(validators, notEmptyValidator)
 			}
