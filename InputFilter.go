@@ -18,10 +18,10 @@ func NewInputFilter() *InputFilter {
 }
 
 type InputFilterResult struct {
-	Result         bool 					`json:"result"`
-	Messages       map[string][]string		`json:"messages"`
-	ValidResults   map[string]InputResult	`json:"validResults"`	
-	InvalidResults map[string]InputResult	`json:"invalidResults"`
+	Result         bool                   `json:"result"`
+	Messages       map[string][]string    `json:"messages"`
+	ValidResults   map[string]InputResult `json:"validResults"`
+	InvalidResults map[string]InputResult `json:"invalidResults"`
 }
 
 func NewInputFilterResult() *InputFilterResult {
@@ -53,6 +53,9 @@ func (inputF *InputFilter) Validate(d map[string]interface{}) InputFilterResult 
 	invalidResults := make(map[string]InputResult)
 	vResult := true
 
+	ir.InvalidResults = invalidResults
+	ir.ValidResults = validResults
+
 	// Validate inputs
 	for _, i := range inputF.Inputs {
 		if !i.Required && d[i.Name] == nil {
@@ -65,6 +68,11 @@ func (inputF *InputFilter) Validate(d map[string]interface{}) InputFilterResult 
 			vResult = false
 			invalidResults[i.Name] = inputValueRslt
 			messages[i.Name] = msgs
+
+			if inputF.BreakOnFailure {
+				ir.Result = vResult
+				return ir
+			}
 		}
 		if rslt {
 			validResults[i.Name] = inputValueRslt
@@ -72,9 +80,6 @@ func (inputF *InputFilter) Validate(d map[string]interface{}) InputFilterResult 
 	}
 
 	ir.Result = vResult
-	ir.InvalidResults = invalidResults
-	ir.ValidResults = validResults
-
 	return ir
 }
 

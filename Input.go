@@ -1,7 +1,6 @@
 package ecms_go_inputfilter
 
 import (
-	"github.com/extensible-cms/ecms-go-inputfilter/sliceof"
 	ecmsValidator "github.com/extensible-cms/ecms-go-validator"
 )
 
@@ -67,11 +66,11 @@ func RunValidators(i *Input, x interface{}) (bool, []string) {
 	}
 
 	vResult := true
-	messageSlices := make([][]string, 0)
+	outMessages := make([]string, 0)
 	for _, v := range i.Validators {
 		result, messages := v(x)
 		if !result {
-			messageSlices = append(messageSlices, messages)
+			outMessages = append(outMessages, messages...)
 			vResult = false
 		}
 		if i.BreakOnFailure {
@@ -79,7 +78,7 @@ func RunValidators(i *Input, x interface{}) (bool, []string) {
 		}
 	}
 
-	return vResult, sliceof.SliceOfStringConcat(messageSlices)
+	return vResult, outMessages
 }
 
 func RunFilters(i *Input, x interface{}) interface{} {

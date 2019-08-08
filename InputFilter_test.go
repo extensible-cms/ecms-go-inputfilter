@@ -128,6 +128,27 @@ func TestInputFilter_Validate(t *testing.T) {
 			}(),
 		},
 		{
+			"All fields valid (should pass)",
+			&ContactFormInputFilter,
+			map[string]interface{}{
+				"name":    "Masambula",
+				"email":   "masambula@aol.com",
+				"subject": "Hello World!",
+				"message": "Greetings from the hither world!",
+			},
+			func() *InputFilterResult {
+				o := NewInputFilterResult()
+				o.Result = true
+				o.ValidResults = map[string]InputResult{
+					"name":    NewInputResult("name", "Hello World"),
+					"email":   NewInputResult("email", "masambula@aol.com"),
+					"subject": NewInputResult("subject", "Hello World!"),
+					"message": NewInputResult("message", "Greetings from the hither world!"),
+				}
+				return o
+			}(),
+		},
+		{
 			"All fields invalid (should fail)",
 			&ContactFormInputFilter,
 			map[string]interface{}{
@@ -165,8 +186,13 @@ func TestInputFilter_Validate(t *testing.T) {
 			}(),
 		},
 		{
-			"All fields valid (should pass)",
-			&ContactFormInputFilter,
+			"All fields valid (`len(InputFilter{BreakOnFailure}).InvalidResults === 0`)",
+			func() *InputFilter {
+				o := NewInputFilter()
+				o.Inputs = ContactFormInputFilter.Inputs
+				o.BreakOnFailure = true
+				return o
+			}(),
 			map[string]interface{}{
 				"name":    "Masambula",
 				"email":   "masambula@aol.com",
@@ -182,6 +208,97 @@ func TestInputFilter_Validate(t *testing.T) {
 					"subject": NewInputResult("subject", "Hello World!"),
 					"message": NewInputResult("message", "Greetings from the hither world!"),
 				}
+				return o
+			}(),
+		},
+		{
+			"All fields invalid (`len(InputFilter{BreakOnFailure}).InvalidResults === 1`)",
+			func() *InputFilter {
+				o := NewInputFilter()
+				o.Inputs = ContactFormInputFilter.Inputs
+				o.BreakOnFailure = true
+				return o
+			}(),
+			map[string]interface{}{
+				"name":    "999",
+				"email":   "999",
+				"subject": "",
+				"message": "",
+			},
+			func() *InputFilterResult {
+				o := NewInputFilterResult()
+				o.Result = false
+				o.InvalidResults = map[string]InputResult{
+					"name": func() InputResult {
+						o := NewInputResult("name", "999")
+						o.Result = false
+						return o
+					}(),
+					// `BreakOnFailure` flag of InputFilter will force a return on first failing input
+					//  (hence why only expecting one invalid input result)
+				}
+				return o
+			}(),
+		},
+		{
+			"Only required fields (`len(InputFilter{BreakOnFailure}.InvalidResults) === 0`)",
+			func() *InputFilter {
+				o := NewInputFilter()
+				o.BreakOnFailure = true
+				o.Inputs["name"] = ContactFormInputFilter.Inputs["name"]
+				o.Inputs["email"] = ContactFormInputFilter.Inputs["email"]
+				o.Inputs["subject"] = ContactFormInputFilter.Inputs["subject"]
+				o.Inputs["message"] = ContactFormInputFilter.Inputs["message"]
+				return o
+			}(),
+			map[string]interface{}{
+				"name":    "Hello World",
+				"email":   "abc@abc.com",
+				"message": "Some description here.",
+			},
+			func() *InputFilterResult {
+				o := NewInputFilterResult()
+				o.Result = true
+				// 'subject' input is skipped due to being `not required` (see 'TestFixtures') and `nil`
+				o.ValidResults = map[string]InputResult{
+					"name":    NewInputResult("name", "Hello World"),
+					"message": NewInputResult("name", "Some description here."),
+					"email":   NewInputResult("name", "abc@abc.com"),
+				}
+				return o
+			}(),
+		},
+		{
+			"No required fields (`len(InputFilter{BreakOnFailure}.InvalidResults) === 1`)",
+			func() *InputFilter {
+				o := NewInputFilter()
+				o.BreakOnFailure = true
+				o.Inputs["name"] = ContactFormInputFilter.Inputs["name"]
+				o.Inputs["email"] = ContactFormInputFilter.Inputs["email"]
+				o.Inputs["subject"] = ContactFormInputFilter.Inputs["subject"]
+				o.Inputs["message"] = ContactFormInputFilter.Inputs["message"]
+				return o
+			}(),
+			map[string]interface{}{
+				"subject": "Hello World",
+			},
+			func() *InputFilterResult {
+				o := NewInputFilterResult()
+				o.Result = false
+				o.InvalidResults = map[string]InputResult{
+					"name": func() InputResult {
+						o := NewInputResult("name", nil)
+						o.Result = false
+						return o
+					}(),
+					// `BreakOnFailure` flag of InputFilter will force a return on first failing input
+					//  (hence why only expecting one invalid input result)
+				}
+				// `BreakOnFailure` causes exit on first `Input` so we never get to validate the one valid
+				// input here (hence why code below is commented out).
+				//o.ValidResults = map[string]InputResult{
+				//	"subject": NewInputResult("subject", nil),
+				//}
 				return o
 			}(),
 		},
