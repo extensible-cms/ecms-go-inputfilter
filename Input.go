@@ -1,7 +1,6 @@
 package ecms_go_inputfilter
 
 import (
-	"github.com/extensible-cms/ecms-go-inputfilter/sliceof"
 	ecmsValidator "github.com/extensible-cms/ecms-go-validator"
 )
 
@@ -10,26 +9,32 @@ type Input struct {
 	Required        bool
 	Filters         []Filter
 	Validators      []ecmsValidator.Validator
-	//RequiredMessage string
+	RequiredMessage string
 	BreakOnFailure  bool
 	Obscurer        Filter
 }
 
+func NewInput(name string) *Input {
+	return &Input{
+		Name: name,
+	}
+}
+
 type InputResult struct {
-	Name          string
-	Result        bool
-	messages      []string
-	Value         interface{}
-	RawValue      interface{}
-	ObscuredValue interface{}
-	FilteredValue interface{}
+	Name          string      `json:"name"`
+	Result        bool        `json:"result"`
+	Messages      []string    `json:"messages"`
+	Value         interface{} `json:"value"`
+	RawValue      interface{} `json:"rawValue"`
+	ObscuredValue interface{} `json:"obscuredValue"`
+	FilteredValue interface{} `json:"filteredValue"`
 }
 
 func NewInputResult(name string, x interface{}) InputResult {
 	return InputResult{
 		Name:          name,
-		Result:        false,
-		messages:      nil,
+		Result:        true,
+		Messages:      nil,
 		Value:         x,
 		RawValue:      x,
 		ObscuredValue: x,
@@ -48,21 +53,24 @@ type InputInterface interface {
 func RunValidators(i *Input, x interface{}) (bool, []string) {
 	hasValidators := i.Validators != nil && len(i.Validators) > 0
 
-	if !i.Required && !hasValidators {
+	if (!i.Required && x == nil) || (!i.Required && !hasValidators) {
 		return true, nil
 	}
 
 	if i.Required && !hasValidators && x == nil {
-		// @todo add noempty validator
-		return false, []string{"\"" + i.Name + "\" is required.  Value received: `nil`."}
+		msg := i.RequiredMessage
+		if len(i.RequiredMessage) == 0 {
+			msg = "\"" + i.Name + "\" is required.  Value received: `nil`."
+		}
+		return false, []string{msg}
 	}
 
 	vResult := true
-	messageSlices := make([][]string, 0)
+	outMessages := make([]string, 0)
 	for _, v := range i.Validators {
 		result, messages := v(x)
 		if !result {
-			messageSlices = append(messageSlices, messages)
+			outMessages = append(outMessages, messages...)
 			vResult = false
 		}
 		if i.BreakOnFailure {
@@ -70,7 +78,7 @@ func RunValidators(i *Input, x interface{}) (bool, []string) {
 		}
 	}
 
-	return vResult, sliceof.SliceOfStringConcat(messageSlices)
+	return vResult, outMessages
 }
 
 func RunFilters(i *Input, x interface{}) interface{} {
@@ -97,6 +105,9 @@ func (i *Input) Validate(x interface{}) (bool, []string, InputResult) {
 			iResult.ObscuredValue = i.Obscurer(iResult.FilteredValue)
 		}
 	}
+
+	iResult.Result = vResult
+	iResult.Messages = messages
 
 	return vResult,
 		messages,
