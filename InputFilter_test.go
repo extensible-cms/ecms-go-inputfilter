@@ -1,6 +1,7 @@
 package ecms_go_inputfilter
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -82,13 +83,145 @@ func TestInputFilter_Validate(t *testing.T) {
 				"email":   "abc@abc.com",
 				"message": "Some description here.",
 			},
-			NewInputFilterResult(),
+			func() *InputFilterResult {
+				o := NewInputFilterResult()
+				o.Result = true
+				// 'subject' input is skipped due to being `not required` (see 'TestFixtures') and `nil`
+				o.ValidResults = map[string]InputResult{
+					"name":    NewInputResult("name", "Hello World"),
+					"message": NewInputResult("name", "Some description here."),
+					"email":   NewInputResult("name", "abc@abc.com"),
+				}
+				return o
+			}(),
+		},
+		{
+			"No required fields (should fail)",
+			&ContactFormInputFilter,
+			map[string]interface{}{
+				"subject": "Hello World",
+			},
+			func() *InputFilterResult {
+				o := NewInputFilterResult()
+				o.Result = false
+				o.InvalidResults = map[string]InputResult{
+					"name": func() InputResult {
+						o := NewInputResult("name", nil)
+						o.Result = false
+						return o
+					}(),
+					"message": func() InputResult {
+						o := NewInputResult("message", nil)
+						o.Result = false
+						return o
+					}(),
+					"email": func() InputResult {
+						o := NewInputResult("email", nil)
+						o.Result = false
+						return o
+					}(),
+				}
+				o.ValidResults = map[string]InputResult{
+					"subject": NewInputResult("subject", nil),
+				}
+				return o
+			}(),
+		},
+		{
+			"All fields invalid (should fail)",
+			&ContactFormInputFilter,
+			map[string]interface{}{
+				"name":    "999",
+				"email":   "999",
+				"subject": "",
+				"message": "",
+			},
+			func() *InputFilterResult {
+				o := NewInputFilterResult()
+				o.Result = false
+				o.InvalidResults = map[string]InputResult{
+					"name": func() InputResult {
+						o := NewInputResult("name", "999")
+						o.Result = false
+						return o
+					}(),
+					"email": func() InputResult {
+						o := NewInputResult("email", "999")
+						o.Result = false
+						return o
+					}(),
+					"subject": func() InputResult {
+						o := NewInputResult("subject", "")
+						o.Result = false
+						return o
+					}(),
+					"message": func() InputResult {
+						o := NewInputResult("message", "")
+						o.Result = false
+						return o
+					}(),
+				}
+				return o
+			}(),
+		},
+		{
+			"All fields valid (should pass)",
+			&ContactFormInputFilter,
+			map[string]interface{}{
+				"name":    "Masambula",
+				"email":   "masambula@aol.com",
+				"subject": "Hello World!",
+				"message": "Greetings from the hither world!",
+			},
+			func() *InputFilterResult {
+				o := NewInputFilterResult()
+				o.Result = true
+				o.ValidResults = map[string]InputResult{
+					"name":    NewInputResult("name", "Hello World"),
+					"email":   NewInputResult("email", "masambula@aol.com"),
+					"subject": NewInputResult("subject", "Hello World!"),
+					"message": NewInputResult("message", "Greetings from the hither world!"),
+				}
+				return o
+			}(),
 		},
 	} {
 		t.Run(tc.Name, func(t2 *testing.T) {
 			resultF := tc.InputFilter.Validate(tc.Data)
 			ExpectEqual(t2, "Result:", resultF.Result, tc.Expected.Result)
-			t2.Logf("%v", resultF.InvalidResults["name"])
+			ExpectEqual(t2, "len(InvalidResults)", len(resultF.InvalidResults), len(tc.Expected.InvalidResults))
+			ExpectEqual(t2, "len(ValidResults)", len(resultF.ValidResults), len(tc.Expected.ValidResults))
+			t2.Run("Inspect invalid results", func(t3 *testing.T) {
+				for k, ir := range resultF.InvalidResults {
+					n := fmt.Sprintf(
+						"InputResult{\"%v\"}.Result === Expected.InvalidResults[\"%v\"].Result",
+						k, k,
+					)
+					t3.Run(n, func(t4 *testing.T) {
+						ExpectEqual(t4, n, ir.Result, tc.Expected.InvalidResults[k].Result)
+					})
+				}
+			})
+			t2.Run("Inspect valid results", func(t3 *testing.T) {
+				for k, ir := range resultF.ValidResults {
+					resultCheckName := fmt.Sprintf(
+						"InputResult{\"%v\"}.Result === Expected.ValidResults[\"%v\"].Result",
+						k, k,
+					)
+					rawValueCheckName := fmt.Sprintf(
+						"InputResult{\"%v\"}.Result === Expected.ValidResults[\"%v\"].Result",
+						k, k,
+					)
+					t3.Run(resultCheckName, func(t4 *testing.T) {
+						ExpectEqual(t4, resultCheckName, ir.Result, tc.Expected.ValidResults[k].Result)
+					})
+					t3.Run(rawValueCheckName, func(t4 *testing.T) {
+						ExpectEqual(t4, rawValueCheckName, ir.RawValue, tc.Data[k])
+					})
+				}
+			})
+			t2.Logf("Invalid input results: %v", resultF.InvalidResults)
+			t2.Logf("Valid input results: %v", resultF.ValidResults)
 		})
 	}
 }

@@ -37,10 +37,10 @@ func init() {
 
 	EmailInput.AddValidator(fakeEmailValidator)
 
-	DescrLenValidatorOps := ecms_validator.NewIntRangeValidatorOptions()
+	DescrLenValidatorOps := ecms_validator.NewLengthValidatorOptions()
 	DescrLenValidatorOps.Min = 1
 	DescrLenValidatorOps.Max = 2048
-	DescrLenValidator := ecms_validator.IntRangeValidator(DescrLenValidatorOps)
+	DescrLenValidator := ecms_validator.LengthValidator(DescrLenValidatorOps)
 
 	SubjInput = NewInput("subject")
 	SubjInput.AddValidator(func() ecms_validator.Validator {

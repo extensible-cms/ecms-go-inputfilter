@@ -55,6 +55,10 @@ func (inputF *InputFilter) Validate(d map[string]interface{}) InputFilterResult 
 
 	// Validate inputs
 	for _, i := range inputF.Inputs {
+		if !i.Required && d[i.Name] == nil {
+			continue
+		}
+
 		rslt, msgs, inputValueRslt := i.Validate(d[i.Name])
 
 		if !rslt {
