@@ -8,13 +8,7 @@
 
 # IDEs
 # =======
-.idea/*.iml
-.idea/modules.xml
-.idea/workspace.xml
-.idea/encodings.xml
-.idea/dataSources.xml
-.idea/dataSources.local.xml
-.idea/dataSources/
+.idea/
 
 # Binaries for programs and plugins
 # =======

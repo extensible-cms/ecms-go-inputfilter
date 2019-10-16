@@ -1,7 +1,6 @@
 package ecms_go_inputfilter
 
 import (
-	"fmt"
 	ecms_validator "github.com/extensible-cms/ecms-go-validator"
 	"regexp"
 )
@@ -18,9 +17,6 @@ func init() {
 	nameValidatorOps := ecms_validator.NewRegexValidatorOptions()
 	nameValidatorOps.Pattern = regexp.MustCompile("^[a-zA-Z][a-zA-Z\\s'\"]{4,54}$")
 	NameValidator := ecms_validator.RegexValidator(nameValidatorOps)
-
-	nametestRslt, nametestMsgs := NameValidator("abcd")
-	fmt.Printf("nametestMsgs: %v; nametest: %v", nametestMsgs, nametestRslt)
 
 	NameInput = NewInput("name")
 	NameInput.Required = true
