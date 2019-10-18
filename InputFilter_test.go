@@ -171,11 +171,7 @@ func TestInputFilter_Validate(t *testing.T) {
 						o.Result = false
 						return o
 					}(),
-					"subject": func() InputResult {
-						o := NewInputResult("subject", "")
-						o.Result = false
-						return o
-					}(),
+					//"subject": ... // subject is `.Required` so should get skipped
 					"message": func() InputResult {
 						o := NewInputResult("message", "")
 						o.Result = false

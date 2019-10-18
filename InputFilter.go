@@ -3,6 +3,7 @@ package ecms_go_inputfilter
 import (
 	"errors"
 	"fmt"
+	"github.com/extensible-cms/ecms-go-validator/is"
 )
 
 type InputFilter struct {
@@ -58,7 +59,7 @@ func (inputF *InputFilter) Validate(d map[string]interface{}) InputFilterResult 
 
 	// Validate inputs
 	for _, i := range inputF.Inputs {
-		if !i.Required && d[i.Name] == nil {
+		if !i.Required && is.Empty(d[i.Name]) {
 			continue
 		}
 
