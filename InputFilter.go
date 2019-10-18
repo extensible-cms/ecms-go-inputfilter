@@ -56,6 +56,7 @@ func (inputF *InputFilter) Validate(d map[string]interface{}) InputFilterResult 
 
 	ir.InvalidResults = invalidResults
 	ir.ValidResults = validResults
+	ir.Messages = messages
 
 	// Validate inputs
 	for _, i := range inputF.Inputs {

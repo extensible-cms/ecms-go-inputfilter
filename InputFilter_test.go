@@ -265,7 +265,7 @@ func TestInputFilter_Validate(t *testing.T) {
 			}(),
 		},
 		{
-			"No required fields (`len(InputFilter{BreakOnFailure}.InvalidResults) === 1`)",
+			"No required fields #2 (`len(InputFilter{BreakOnFailure}.InvalidResults) === 1`)",
 			func() *InputFilter {
 				o := NewInputFilter()
 				o.BreakOnFailure = true
@@ -281,6 +281,7 @@ func TestInputFilter_Validate(t *testing.T) {
 			func() *InputFilterResult {
 				o := NewInputFilterResult()
 				o.Result = false
+				o.Messages = map[string][]string{"name": []string{""}}
 				o.InvalidResults = map[string]InputResult{
 					"name": func() InputResult {
 						o := NewInputResult("name", nil)
@@ -301,9 +302,13 @@ func TestInputFilter_Validate(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t2 *testing.T) {
 			resultF := tc.InputFilter.Validate(tc.Data)
-			ExpectEqual(t2, "Result:", resultF.Result, tc.Expected.Result)
-			ExpectEqual(t2, "len(InvalidResults)", len(resultF.InvalidResults), len(tc.Expected.InvalidResults))
-			ExpectEqual(t2, "len(ValidResults)", len(resultF.ValidResults), len(tc.Expected.ValidResults))
+			invalidResultsLen := len(resultF.InvalidResults)
+			expectedInvalidResultsLen := len(tc.Expected.InvalidResults)
+			messagesLen := len(resultF.Messages)
+			ExpectEqual(t2, "Result == Expected Result:", resultF.Result, tc.Expected.Result)
+			ExpectEqual(t2, "len(InvalidResults) == len(Expected...)", invalidResultsLen, expectedInvalidResultsLen)
+			ExpectEqual(t2, "len(ValidResults) == len(Expected...)", len(resultF.ValidResults), len(tc.Expected.ValidResults))
+			ExpectEqual(t2, "len(Messages) == len(InvalidResults)", invalidResultsLen, messagesLen)
 			t2.Run("Inspect invalid results", func(t3 *testing.T) {
 				for k, ir := range resultF.InvalidResults {
 					n := fmt.Sprintf(
@@ -333,8 +338,8 @@ func TestInputFilter_Validate(t *testing.T) {
 					})
 				}
 			})
-			t2.Logf("Invalid input results: %v", resultF.InvalidResults)
-			t2.Logf("Valid input results: %v", resultF.ValidResults)
+			//t2.Logf("Invalid input results: %v", resultF.InvalidResults)
+			//t2.Logf("Valid input results: %v", resultF.ValidResults)
 		})
 	}
 }
